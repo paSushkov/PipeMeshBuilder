@@ -1,0 +1,25 @@
+{
+  "name": "com.pavel_sushkov.pipe_mesh_builder",
+  "version": "1.0.0",
+  "displayName": "PipeMeshBuilder",
+  "keywords": [
+    "Procedural",
+    "Mesh",
+    "Pipe",
+    "Tube"
+  ],
+  "author": {
+    "name": "Pavel Sushkov",
+    "email": "pa.sushkov@gmail.com",
+    "url": "http://none.com/"
+  },
+  "description": "Tool to make meshes in shape of pipe, which can have outer/inner walls + edges.\nShape is formed by control points which can be added / moved / removed in Scene View.\nAlso you can limit turns angle, change radius of turns to get more smooth/edgy turnings.\nGenerates adjustable LOD meshes.",
+  "unity": "2019.3",
+  "samples": [
+    {
+      "displayName": "Sample",
+      "description": "Some samples",
+      "path": "Samples~/Sample1"
+    }
+  ]
+}
