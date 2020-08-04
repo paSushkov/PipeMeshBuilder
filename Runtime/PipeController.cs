@@ -7,7 +7,6 @@ using Random = UnityEngine.Random;
 [Serializable]
 public class PipeController : MonoBehaviour
 {
-    /// TODO: transfer all calculation to DOTS. A lot of math.
     /// TODO: add check for vertices overlay in corners. Small turn arc + a lot of detail + huge pipe radius = vertcices overlay each other !!!
     /// TODO: add option to loop control line and mesh
     /// TODO: add check on attemt to change min turn radius
@@ -167,7 +166,6 @@ public class PipeController : MonoBehaviour
 
         }
     }
-
     private float outerRadius = 2.5f;
     /// <summary>
     /// Checks if value > inner radius
@@ -1136,7 +1134,7 @@ public class PipeController : MonoBehaviour
             int[] triangles;
             GenerateInnerPipeTriangles(ref CentralLineVariant, ref CircleDetail, out triangles);
 
-
+            FlipUVs(ref lenghtUVs);
 
             BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref lenghtUVs);
         }
@@ -1169,6 +1167,7 @@ public class PipeController : MonoBehaviour
 
             Vector2[] UVs = new Vector2[outerVertices.Length * 2 + edge1Vertices.Length * 2];
             lenghtUVs.CopyTo(UVs, 0);
+            FlipUVs(ref UVs);
             lenghtUVs.CopyTo(UVs, outerVertices.Length);
 
             Vector2[] edgeUVs = new Vector2[edge1Vertices.Length * 2];
@@ -1234,6 +1233,16 @@ public class PipeController : MonoBehaviour
         }
         return UVs;
     }
+
+    private void FlipUVs(ref Vector2[] UV)
+    {
+        for (int i = 0; i < UV.Length; i++)
+        {
+            UV[i] = new Vector2(1f - UV[i].x, 1f - UV[i].y); 
+        }
+    
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1356,6 +1365,7 @@ public class PipeController : MonoBehaviour
         GeneratePipeMesh(ref previewMesh, GenerateInnerSide, GenerateOuterSide, CenterLinesList[0], basePipeDetail);
     }
     #endregion
+  
     /// <summary>
     /// Fills lodMeshesList list
     /// </summary>
