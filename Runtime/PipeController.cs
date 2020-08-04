@@ -1134,7 +1134,7 @@ public class PipeController : MonoBehaviour
             int[] triangles;
             GenerateInnerPipeTriangles(ref CentralLineVariant, ref CircleDetail, out triangles);
 
-            FlipUVs(ref lenghtUVs);
+            FlipUVs_U(ref lenghtUVs);
 
             BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref lenghtUVs);
         }
@@ -1167,7 +1167,7 @@ public class PipeController : MonoBehaviour
 
             Vector2[] UVs = new Vector2[outerVertices.Length * 2 + edge1Vertices.Length * 2];
             lenghtUVs.CopyTo(UVs, 0);
-            FlipUVs(ref UVs);
+            FlipUVs_U(ref UVs);
             lenghtUVs.CopyTo(UVs, outerVertices.Length);
 
             Vector2[] edgeUVs = new Vector2[edge1Vertices.Length * 2];
@@ -1234,18 +1234,17 @@ public class PipeController : MonoBehaviour
         return UVs;
     }
 
-    private void FlipUVs(ref Vector2[] UV)
+    private void FlipUVs_U(ref Vector2[] UV)
     {
         for (int i = 0; i < UV.Length; i++)
         {
-            UV[i] = new Vector2(1f - UV[i].x, 1f - UV[i].y); 
+            UV[i] = new Vector2(1-UV[i].x, UV[i].y); 
         }
-    
     }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    
     /// <summary>
     /// Calculates amount of triangles for CenterLinesList[0] and passed amount of vertices around nodes
     /// </summary>
