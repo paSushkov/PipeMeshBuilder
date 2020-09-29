@@ -46,7 +46,6 @@ public class PipeController : MonoBehaviour
     // List of LOD meshes. Filled with GenerateLODmeshes()
     public List<Mesh> lodMeshesList;
 
-
     public bool GenerateOuterSide = true;
     public bool GenerateInnerSide = true;
 
@@ -60,6 +59,7 @@ public class PipeController : MonoBehaviour
     /// </summary>
     public int lodVariantsCount = 1;
 
+    public float extraRotation = 0f;
 
     /// <summary>
     /// Only list with index 0 in use now. Created because other variants of CenterLines (ex. - less points in turns) could be used for LOD generation;
@@ -89,7 +89,13 @@ public class PipeController : MonoBehaviour
         private set => centerLinesList = value;
     }
 
-
+    public Vector2 uvTilingInner;
+    public Vector2 uvOffsetInner;
+    public Vector2 uvTilingOuter;
+    public Vector2 uvOffsetOuter;
+    public Vector2 uvTilingEdges;
+    public Vector2 uvOffsetEdges;
+    
     public bool displayCenterLine = true;
 
     private bool viewPreviewMesh = false;
@@ -108,7 +114,6 @@ public class PipeController : MonoBehaviour
             {
                 UpdatePrewiewEvent -= RebuildPreviewMesh;
             }
-
         }
     }
 
@@ -241,7 +246,7 @@ public class PipeController : MonoBehaviour
     }
 
     public int baseCornersDetail = 3;
-    
+
     /// <summary>
     /// Default angle which is assigned to the first and last ControlNodes
     /// </summary>
@@ -651,7 +656,6 @@ public class PipeController : MonoBehaviour
     /// </summary>
     public void BuildTubeCenterLine(List<CenterLineNode> CentralLineVariant, int CornerDetail)
     {
-
         if (CentralLineVariant == null)
             CentralLineVariant = new List<CenterLineNode>();
         else
@@ -672,6 +676,7 @@ public class PipeController : MonoBehaviour
         forward = (-(ControlNodes[0].NodePositionLocal - ControlNodes[1].NodePositionLocal)).normalized;
         // Generate random normal Up for the first node. Later we will assign normals which based on position and normals of the next one
         randomUp = PipeController.RandomOrthogonal(forward).normalized;
+
         up = randomUp;
         right = Vector3.Cross(up, forward).normalized;
         CenterLineNode newNode = new CenterLineNode(ControlNodes[0].NodePositionLocal, forward, up, right);
@@ -993,9 +998,9 @@ public class PipeController : MonoBehaviour
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     #region Functions-tools which used for mesh generation
-    
+
     public void GeneratePipeVertices(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail, ref float radius, out Vector3[] Vertices)
     {
         Vertices = new Vector3[CentralLineVariant.Count * (CircleDetail)];
@@ -1006,12 +1011,12 @@ public class PipeController : MonoBehaviour
             for (int j = 0; j < CircleDetail; j++)
             {
 
-                Vertices[index] = CentralLineVariant[i].LocalPosition + (Quaternion.AngleAxis(angleStep * j, CentralLineVariant[i].Forward) * CentralLineVariant[i].Up) * radius;
+                Vertices[index] = CentralLineVariant[i].LocalPosition + (Quaternion.AngleAxis(angleStep * j + extraRotation, CentralLineVariant[i].Forward) * CentralLineVariant[i].Up) * radius;
                 index++;
             }
         }
     }
-    
+
     public void GenerateEdgesVertices(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail, ref float OuterRadius, ref float InnerRadius, out Vector3[] Edge1Vertices, out Vector3[] Edge2Vertices)
     {
         Edge1Vertices = new Vector3[CircleDetail * 2];
@@ -1019,24 +1024,21 @@ public class PipeController : MonoBehaviour
 
         float angleStep = 360f / (CircleDetail - 1);
 
-
         for (int index = 0; index < CircleDetail; index++)
         {
-
-            Edge1Vertices[index] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * InnerRadius;
-            Edge1Vertices[index + CircleDetail] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * OuterRadius;
-
+            Edge1Vertices[index] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * InnerRadius;
+            Edge1Vertices[index + CircleDetail] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * OuterRadius;
         }
 
         CenterLineNode lastNode = CentralLineVariant[CentralLineVariant.Count - 1];
         for (int index = 0; index < CircleDetail; index++)
         {
 
-            Edge2Vertices[index] = (lastNode.LocalPosition + (Quaternion.AngleAxis(angleStep * index, lastNode.Forward) * lastNode.Up) * InnerRadius);
-            Edge2Vertices[index + CircleDetail] = lastNode.LocalPosition + (Quaternion.AngleAxis(angleStep * index, lastNode.Forward) * lastNode.Up) * OuterRadius;
+            Edge2Vertices[index] = (lastNode.LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, lastNode.Forward) * lastNode.Up) * InnerRadius);
+            Edge2Vertices[index + CircleDetail] = lastNode.LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, lastNode.Forward) * lastNode.Up) * OuterRadius;
         }
     }
-    
+
     public void GenerateInnerPipeTriangles(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail, out int[] Triangles)
     {
         Triangles = new int[CircleDetail * 6 * (CentralLineVariant.Count - 1)];
@@ -1055,7 +1057,7 @@ public class PipeController : MonoBehaviour
             }
         }
     }
-    
+
     public void GenerateOuterPipeTriangles(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail, out int[] Triangles)
     {
         Triangles = new int[(CircleDetail) * 6 * (CentralLineVariant.Count - 1)];
@@ -1077,7 +1079,7 @@ public class PipeController : MonoBehaviour
         }
 
     }
-    
+
     public void GeneratePipeEdgesTriangles(ref int CircleDetail, out int[] FirstEdge, out int[] SecondEdge)
     {
         FirstEdge = new int[CircleDetail * 2 * 6];
@@ -1113,11 +1115,10 @@ public class PipeController : MonoBehaviour
             }
         }
     }
-    
+
     public void GeneratePipeMesh(ref Mesh MyMesh, bool InnerSide, bool OuterSide, List<CenterLineNode> CentralLineVariant, int CircleDetail)
     {
-
-        Vector2[] lenghtUVs = BuildUVsInLenght(ref CentralLineVariant, ref CircleDetail);
+        Vector2[] lenghtUVsOriginal = BuildUVsInLenght(ref CentralLineVariant, ref CircleDetail);
 
         if (MyMesh == null)
             MyMesh = new Mesh();
@@ -1134,9 +1135,9 @@ public class PipeController : MonoBehaviour
             int[] triangles;
             GenerateInnerPipeTriangles(ref CentralLineVariant, ref CircleDetail, out triangles);
 
-            FlipUVs_U(ref lenghtUVs);
-
-            BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref lenghtUVs);
+            FlipUVs_U(ref lenghtUVsOriginal);
+            var innerUVs = ApplyTilingAndOffset(ref lenghtUVsOriginal, uvTilingInner, uvOffsetInner);
+            BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref innerUVs);
         }
         else if (!InnerSide && OuterSide)
         {
@@ -1146,7 +1147,8 @@ public class PipeController : MonoBehaviour
             int[] triangles;
             GenerateOuterPipeTriangles(ref CentralLineVariant, ref CircleDetail, out triangles);
 
-            BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref lenghtUVs);
+            var outerUVs = ApplyTilingAndOffset(ref lenghtUVsOriginal, uvTilingOuter, uvOffsetOuter);
+            BuildPipeMesh(ref MyMesh, ref vertices, ref triangles, ref outerUVs);
         }
         else if (InnerSide && OuterSide)
         {
@@ -1164,26 +1166,28 @@ public class PipeController : MonoBehaviour
             int[] edge1Triangles;
             int[] edge2Triangles;
 
+            var outerUVs = ApplyTilingAndOffset(ref lenghtUVsOriginal, uvTilingOuter, uvOffsetOuter);
+            var innerUVs = ApplyTilingAndOffset(ref lenghtUVsOriginal, uvTilingInner, uvOffsetInner);
+            FlipUVs_U(ref innerUVs);
 
             Vector2[] UVs = new Vector2[outerVertices.Length * 2 + edge1Vertices.Length * 2];
-            lenghtUVs.CopyTo(UVs, 0);
-            FlipUVs_U(ref UVs);
-            lenghtUVs.CopyTo(UVs, outerVertices.Length);
+            
+            outerUVs.CopyTo(UVs, 0);
+            innerUVs.CopyTo(UVs, outerVertices.Length);
 
             Vector2[] edgeUVs = new Vector2[edge1Vertices.Length * 2];
 
             for (int i = 0; i < CircleDetail; i++)
             {
-                edgeUVs[i] = new Vector2((float)i / (CircleDetail - 1), 0f);
-                edgeUVs[i + CircleDetail] = new Vector2((float)i / (CircleDetail - 1), 1f);
+                edgeUVs[i] = new Vector2((float)i / (1-CircleDetail), 0f);
+                edgeUVs[i + CircleDetail] = new Vector2((float)i / (1-CircleDetail), 1f);
 
-
-
-                edgeUVs[CircleDetail * 4 - i - 1] = new Vector2((float)i / (CircleDetail - 1), 0f);
-                edgeUVs[CircleDetail * 3 - i - 1] = new Vector2((float)i / (CircleDetail - 1), 1f);
+                edgeUVs[CircleDetail * 4 - i - 1] = new Vector2((float)i / (CircleDetail-1), 0f);
+                edgeUVs[CircleDetail * 3 - i - 1] = new Vector2((float)i / (CircleDetail-1), 1f);
 
             }
 
+            edgeUVs = ApplyTilingAndOffset(ref edgeUVs, uvTilingEdges, uvOffsetEdges);
             edgeUVs.CopyTo(UVs, outerVertices.Length * 2);
 
 
@@ -1200,8 +1204,8 @@ public class PipeController : MonoBehaviour
 
         }
     }
-    
- 
+
+
     private Vector2[] BuildUVsInLenght(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail)
     {
 
@@ -1217,7 +1221,7 @@ public class PipeController : MonoBehaviour
         // Setting up first row of UVs
         for (int i = 0; i < CircleDetail; i++)
         {
-            UVs[i] = new Vector2(0, (float)i / (float)(CircleDetail - 1));
+            UVs[i] = new Vector2(0, 1- (float)i / (float)(CircleDetail));
         }
         // Setting up others, based on central line nodes distance from start
         for (int segment = 1; segment < CentralLineVariant.Count; segment++)
@@ -1228,9 +1232,10 @@ public class PipeController : MonoBehaviour
 
                 float extraU = distanceToPrev / lenghtOfCentralLine;
 
-                UVs[row + segment * CircleDetail] = new Vector2(UVs[row + segment * CircleDetail - CircleDetail].x + extraU, (float)row / (float)(CircleDetail - 1));
+                UVs[row + segment * CircleDetail] = new Vector2(UVs[row + segment * CircleDetail - CircleDetail].x + extraU, 1- (float)row / (float)(CircleDetail));
             }
         }
+
         return UVs;
     }
 
@@ -1238,13 +1243,23 @@ public class PipeController : MonoBehaviour
     {
         for (int i = 0; i < UV.Length; i++)
         {
-            UV[i] = new Vector2(1-UV[i].x, UV[i].y); 
+            UV[i] = new Vector2(UV[i].x, 1 - UV[i].y);
         }
     }
 
+    private Vector2[] ApplyTilingAndOffset(ref Vector2[] original, Vector2 tiling, Vector2 offset)
+    {
+        var result = new Vector2[original.Length];
+        for (int i = 0; i < original.Length; i++)
+        {
+            result[i] = original[i] * tiling;
+            result[i] += offset;
+        }
+        return result;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /// <summary>
     /// Calculates amount of triangles for CenterLinesList[0] and passed amount of vertices around nodes
     /// </summary>
@@ -1281,7 +1296,7 @@ public class PipeController : MonoBehaviour
         MeshToBuild.RecalculateBounds();
         MeshToBuild.Optimize();
     }
-    
+
     /// <summary>
     /// Builds mesh with inner+outer walls + edges
     /// </summary>
@@ -1364,13 +1379,13 @@ public class PipeController : MonoBehaviour
         GeneratePipeMesh(ref previewMesh, GenerateInnerSide, GenerateOuterSide, CenterLinesList[0], basePipeDetail);
     }
     #endregion
-  
+
     /// <summary>
     /// Fills lodMeshesList list
     /// </summary>
     public void GenerateLODmeshes(int DegradeStep, int Count)
     {
-        if (basePipeDetail - (DegradeStep * (Count-1)) < 4)
+        if (basePipeDetail - (DegradeStep * (Count - 1)) < 4)
         {
             Debug.LogWarning($"You are trying to generate too much LOD meshes or using too high step. Current detail of pipe is {basePipeDetail}(-1).\n" +
                 $"You are trying to degrade it down to $(basePipeDetail - (DegradeStep * Count)) with {DegradeStep} step, {Count} times.\n" +
@@ -1417,7 +1432,7 @@ public class PipeController : MonoBehaviour
 
         for (int i = 0; i < lodVariantsList.Count; i++)
         {
-            lodVariantsList[i].name = gameObject.name+"_LOD_"+i;
+            lodVariantsList[i].name = gameObject.name + "_LOD_" + i;
             if (lodVariantsList[i].GetComponent<MeshFilter>() == null)
                 lodVariantsList[i].AddComponent<MeshFilter>();
             if (lodVariantsList[i].GetComponent<MeshRenderer>() == null)
@@ -1430,7 +1445,7 @@ public class PipeController : MonoBehaviour
             else if (!GenerateOuterSide && GenerateInnerSide)
                 lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterial = innerSideMaterial;
             else if (GenerateOuterSide && GenerateInnerSide)
-                lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterials = new Material[3] { outerSideMaterial, innerSideMaterial , edgesSideMaterial};
+                lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterials = new Material[3] { outerSideMaterial, innerSideMaterial, edgesSideMaterial };
         }
 
     }
