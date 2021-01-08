@@ -1004,11 +1004,11 @@ public class PipeController : MonoBehaviour
     public void GeneratePipeVertices(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail, ref float radius, out Vector3[] Vertices)
     {
         Vertices = new Vector3[CentralLineVariant.Count * (CircleDetail)];
-        float angleStep = 360f / (CircleDetail - 1);
-        int index = 0;
-        for (int i = 0; i < CentralLineVariant.Count; i++)
+        var angleStep = 360f / (CircleDetail - 1);
+        var index = 0;
+        for (var i = 0; i < CentralLineVariant.Count; i++)
         {
-            for (int j = 0; j < CircleDetail; j++)
+            for (var j = 0; j < CircleDetail; j++)
             {
 
                 Vertices[index] = CentralLineVariant[i].LocalPosition + (Quaternion.AngleAxis(angleStep * j + extraRotation, CentralLineVariant[i].Forward) * CentralLineVariant[i].Up) * radius;
@@ -1022,16 +1022,16 @@ public class PipeController : MonoBehaviour
         Edge1Vertices = new Vector3[CircleDetail * 2];
         Edge2Vertices = new Vector3[CircleDetail * 2];
 
-        float angleStep = 360f / (CircleDetail - 1);
+        var angleStep = 360f / (CircleDetail - 1);
 
-        for (int index = 0; index < CircleDetail; index++)
+        for (var index = 0; index < CircleDetail; index++)
         {
             Edge1Vertices[index] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * InnerRadius;
             Edge1Vertices[index + CircleDetail] = CentralLineVariant[0].LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, CentralLineVariant[0].Forward) * CentralLineVariant[0].Up) * OuterRadius;
         }
 
         CenterLineNode lastNode = CentralLineVariant[CentralLineVariant.Count - 1];
-        for (int index = 0; index < CircleDetail; index++)
+        for (var index = 0; index < CircleDetail; index++)
         {
 
             Edge2Vertices[index] = (lastNode.LocalPosition + (Quaternion.AngleAxis(angleStep * index + extraRotation, lastNode.Forward) * lastNode.Up) * InnerRadius);
@@ -1043,12 +1043,12 @@ public class PipeController : MonoBehaviour
     {
         Triangles = new int[CircleDetail * 6 * (CentralLineVariant.Count - 1)];
 
-        int ySize = CentralLineVariant.Count - 1;
-        int xSize = CircleDetail - 1;
+        var ySize = CentralLineVariant.Count - 1;
+        var xSize = CircleDetail - 1;
 
         for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++)
         {
-            for (int x = 0; x < xSize; x++, ti += 6, vi++)
+            for (var x = 0; x < xSize; x++, ti += 6, vi++)
             {
                 Triangles[ti] = vi;
                 Triangles[ti + 3] = Triangles[ti + 2] = vi + 1;
@@ -1062,12 +1062,12 @@ public class PipeController : MonoBehaviour
     {
         Triangles = new int[(CircleDetail) * 6 * (CentralLineVariant.Count - 1)];
 
-        int ySize = CentralLineVariant.Count - 1;
-        int xSize = CircleDetail - 1;
+        var ySize = CentralLineVariant.Count - 1;
+        var xSize = CircleDetail - 1;
 
         for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++)
         {
-            for (int x = 0; x < xSize; x++, ti += 6, vi++)
+            for (var x = 0; x < xSize; x++, ti += 6, vi++)
             {
                 Triangles[ti] = vi;
                 Triangles[ti + 1] = vi + 1;
@@ -1086,12 +1086,12 @@ public class PipeController : MonoBehaviour
         SecondEdge = new int[CircleDetail * 2 * 6];
 
 
-        int ySize = 1;
-        int xSize = CircleDetail - 1;
+        var ySize = 1;
+        var xSize = CircleDetail - 1;
 
         for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++)
         {
-            for (int x = 0; x < xSize; x++, ti += 6, vi++)
+            for (var x = 0; x < xSize; x++, ti += 6, vi++)
             {
                 FirstEdge[ti] = vi;
                 FirstEdge[ti + 1] = vi + 1;
@@ -1118,7 +1118,7 @@ public class PipeController : MonoBehaviour
 
     public void GeneratePipeMesh(ref Mesh MyMesh, bool InnerSide, bool OuterSide, List<CenterLineNode> CentralLineVariant, int CircleDetail)
     {
-        Vector2[] lenghtUVsOriginal = BuildUVsInLenght(ref CentralLineVariant, ref CircleDetail);
+        var lenghtUVsOriginal = BuildUVsInLenght(ref CentralLineVariant, ref CircleDetail);
 
         if (MyMesh == null)
             MyMesh = new Mesh();
@@ -1170,14 +1170,14 @@ public class PipeController : MonoBehaviour
             var innerUVs = ApplyTilingAndOffset(ref lenghtUVsOriginal, uvTilingInner, uvOffsetInner);
             FlipUVs_U(ref innerUVs);
 
-            Vector2[] UVs = new Vector2[outerVertices.Length * 2 + edge1Vertices.Length * 2];
+            var UVs = new Vector2[outerVertices.Length * 2 + edge1Vertices.Length * 2];
             
             outerUVs.CopyTo(UVs, 0);
             innerUVs.CopyTo(UVs, outerVertices.Length);
 
-            Vector2[] edgeUVs = new Vector2[edge1Vertices.Length * 2];
+            var edgeUVs = new Vector2[edge1Vertices.Length * 2];
 
-            for (int i = 0; i < CircleDetail; i++)
+            for (var i = 0; i < CircleDetail; i++)
             {
                 edgeUVs[i] = new Vector2((float)i / (1-CircleDetail), 0f);
                 edgeUVs[i + CircleDetail] = new Vector2((float)i / (1-CircleDetail), 1f);
@@ -1209,28 +1209,28 @@ public class PipeController : MonoBehaviour
     private Vector2[] BuildUVsInLenght(ref List<CenterLineNode> CentralLineVariant, ref int CircleDetail)
     {
 
-        Vector2[] UVs = new Vector2[CentralLineVariant.Count * CircleDetail];
+        var UVs = new Vector2[CentralLineVariant.Count * CircleDetail];
 
-        float lenghtOfCentralLine = 0f;
+        var lenghtOfCentralLine = 0f;
 
-        for (int i = 1; i < CentralLineVariant.Count; i++)
+        for (var i = 1; i < CentralLineVariant.Count; i++)
         {
             lenghtOfCentralLine += Vector3.Distance(CentralLineVariant[i - 1].LocalPosition, CentralLineVariant[i].LocalPosition);
         }
 
         // Setting up first row of UVs
-        for (int i = 0; i < CircleDetail; i++)
+        for (var i = 0; i < CircleDetail; i++)
         {
             UVs[i] = new Vector2(0, 1- (float)i / (float)(CircleDetail));
         }
         // Setting up others, based on central line nodes distance from start
-        for (int segment = 1; segment < CentralLineVariant.Count; segment++)
+        for (var segment = 1; segment < CentralLineVariant.Count; segment++)
         {
-            for (int row = 0; row < CircleDetail; row++)
+            for (var row = 0; row < CircleDetail; row++)
             {
-                float distanceToPrev = Vector3.Distance(CentralLineVariant[segment - 1].LocalPosition, CentralLineVariant[segment].LocalPosition);
+                var distanceToPrev = Vector3.Distance(CentralLineVariant[segment - 1].LocalPosition, CentralLineVariant[segment].LocalPosition);
 
-                float extraU = distanceToPrev / lenghtOfCentralLine;
+                var extraU = distanceToPrev / lenghtOfCentralLine;
 
                 UVs[row + segment * CircleDetail] = new Vector2(UVs[row + segment * CircleDetail - CircleDetail].x + extraU, 1- (float)row / (float)(CircleDetail));
             }
@@ -1241,7 +1241,7 @@ public class PipeController : MonoBehaviour
 
     private void FlipUVs_U(ref Vector2[] UV)
     {
-        for (int i = 0; i < UV.Length; i++)
+        for (var i = 0; i < UV.Length; i++)
         {
             UV[i] = new Vector2(UV[i].x, 1 - UV[i].y);
         }
@@ -1250,7 +1250,7 @@ public class PipeController : MonoBehaviour
     private Vector2[] ApplyTilingAndOffset(ref Vector2[] original, Vector2 tiling, Vector2 offset)
     {
         var result = new Vector2[original.Length];
-        for (int i = 0; i < original.Length; i++)
+        for (var i = 0; i < original.Length; i++)
         {
             result[i] = original[i] * tiling;
             result[i] += offset;
@@ -1265,11 +1265,11 @@ public class PipeController : MonoBehaviour
     /// </summary>
     public int ForecastTrianglesAmount(int detail)
     {
-        int lenght = CenterLinesList[0].Count - 1;
+        var lenght = CenterLinesList[0].Count - 1;
 
-        int result = (GenerateOuterSide ? (lenght * 6 * detail) : 0)
-                   + (GenerateInnerSide ? (lenght * 6 * detail) : 0)
-                   + ((GenerateOuterSide && GenerateInnerSide) ? (detail * 2 * 6) * 2 : 0);
+        var result = (GenerateOuterSide ? (lenght * 6 * detail) : 0)
+                     + (GenerateInnerSide ? (lenght * 6 * detail) : 0)
+                     + ((GenerateOuterSide && GenerateInnerSide) ? (detail * 2 * 6) * 2 : 0);
 
         return result;
     }
@@ -1321,11 +1321,11 @@ public class PipeController : MonoBehaviour
         MeshToBuild.subMeshCount = 3;
 
 
-        int innerVertLenght = InnerSideVertices.Length;
-        int outerVertLenght = OuterSideVertices.Length;
-        int edgeVerticesLenght = Edge1Vertices.Length;
+        var innerVertLenght = InnerSideVertices.Length;
+        var outerVertLenght = OuterSideVertices.Length;
+        var edgeVerticesLenght = Edge1Vertices.Length;
 
-        List<Vector3> combinedVerticesList = new List<Vector3>();
+        var combinedVerticesList = new List<Vector3>();
 
 
         combinedVerticesList.AddRange(OuterSideVertices);
@@ -1343,16 +1343,16 @@ public class PipeController : MonoBehaviour
 
         MeshToBuild.SetTriangles(OuterSideTriangles, 0);
 
-        for (int i = 0; i < InnerSideTriangles.Length; i++)
+        for (var i = 0; i < InnerSideTriangles.Length; i++)
         {
             InnerSideTriangles[i] += innerVertLenght;
         }
 
         MeshToBuild.SetTriangles(InnerSideTriangles, 1);
 
-        int[] edgeCombinedTriangles = new int[Edge1Triangles.Length + Edge2Triangles.Length];
+        var edgeCombinedTriangles = new int[Edge1Triangles.Length + Edge2Triangles.Length];
 
-        for (int i = 0; i < Edge1Triangles.Length; i++)
+        for (var i = 0; i < Edge1Triangles.Length; i++)
         {
             edgeCombinedTriangles[i] = Edge1Triangles[i] + innerVertLenght + outerVertLenght;
             edgeCombinedTriangles[i + Edge1Triangles.Length] = Edge2Triangles[i] + innerVertLenght + outerVertLenght + edgeVerticesLenght;
@@ -1383,7 +1383,7 @@ public class PipeController : MonoBehaviour
     /// <summary>
     /// Fills lodMeshesList list
     /// </summary>
-    public void GenerateLODmeshes(int DegradeStep, int Count)
+    public void GenerateLODMeshes(int DegradeStep, int Count)
     {
         if (basePipeDetail - (DegradeStep * (Count - 1)) < 4)
         {
@@ -1407,55 +1407,99 @@ public class PipeController : MonoBehaviour
         }
     }
     /// <summary>
-    /// Fills lodVariantsList. Use only after GenerateLODmeshes()!
+    /// Fills lodVariantsList. Use only after GenerateLODMeshes()!
     /// </summary>
-    public void InstantiateLODGameobjects(int Count)
+    public void InstantiateLODGameObjects(int count)
     {
-        GameObject newLODvariant;
+
         if (lodVariantsList == null)
-            lodVariantsList = new List<GameObject>();
-        if (lodVariantsList.Count > Count)
+            lodVariantsList = new List<GameObject>(count);
+
+        var activeCount = lodVariantsList.Count;
+
+        // Clearing excessive LOD-GameObjects        
+        if (activeCount > count)
         {
-            for (int i = (Count - 1); i < lodVariantsList.Count; i++)
+            while (activeCount > count)
             {
-                DestroyImmediate(lodVariantsList[i]);
+
+                if (lodVariantsList[activeCount-1])
+                    DestroyImmediate(lodVariantsList[activeCount-1]);
+                
+                lodVariantsList.RemoveAt(activeCount-1);
+                activeCount = lodVariantsList.Count;
             }
         }
-        while (lodVariantsList.Count < Count)
+        // Adding some more LOD-GameObjects        
+        else if (activeCount < count)
         {
-            newLODvariant = new GameObject();
-            newLODvariant.transform.position = this.transform.position;
-            newLODvariant.transform.rotation = this.transform.rotation;
-            newLODvariant.transform.parent = this.transform;
-            lodVariantsList.Add(newLODvariant);
-        };
+            lodVariantsList.Capacity = count;
+            
+            var parentGO = gameObject;
+            var parentTransform = transform;
+            var parentName = parentGO.name;
+            var parentLayer = parentGO.layer;
+            var parentTag = parentGO.tag;
 
-        for (int i = 0; i < lodVariantsList.Count; i++)
+            for (var i = activeCount; i < count; i++)
+            {
+                var newLODVariant = new GameObject
+                {
+                    layer = parentLayer,
+                    tag = parentTag, 
+                    name = $"{parentName}_LOD[{i}]"
+                };
+
+                newLODVariant.transform.position = parentTransform.position;
+                newLODVariant.transform.rotation = parentTransform.rotation;
+                newLODVariant.transform.parent = parentTransform;
+                lodVariantsList.Add(newLODVariant);
+            }
+        }
+
+        var newLods = new List<LOD>(count);
+        var lodStep = 1f / count;
+
+        for (var i = 0; i < lodVariantsList.Count; i++)
         {
-            lodVariantsList[i].name = gameObject.name + "_LOD_" + i;
-            if (lodVariantsList[i].GetComponent<MeshFilter>() == null)
-                lodVariantsList[i].AddComponent<MeshFilter>();
-            if (lodVariantsList[i].GetComponent<MeshRenderer>() == null)
-                lodVariantsList[i].AddComponent<MeshRenderer>();
-
+            var lodGO = lodVariantsList[i];
+            
+            if (!lodGO.TryGetComponent(out MeshFilter filter))
+                filter = lodGO.AddComponent<MeshFilter>();
+            
+            if (!lodGO.TryGetComponent(out MeshRenderer renderer))
+                renderer = lodGO.AddComponent<MeshRenderer>();
+            
             lodVariantsList[i].GetComponent<MeshFilter>().sharedMesh = lodMeshesList[i];
 
             if (GenerateOuterSide && !GenerateInnerSide)
-                lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterial = outerSideMaterial;
+                renderer.sharedMaterial = outerSideMaterial;
             else if (!GenerateOuterSide && GenerateInnerSide)
-                lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterial = innerSideMaterial;
+                renderer.sharedMaterial = innerSideMaterial;
             else if (GenerateOuterSide && GenerateInnerSide)
-                lodVariantsList[i].GetComponent<MeshRenderer>().sharedMaterials = new Material[3] { outerSideMaterial, innerSideMaterial, edgesSideMaterial };
-        }
+                renderer.sharedMaterials = new [] { outerSideMaterial, innerSideMaterial, edgesSideMaterial };
 
+            var newLOD = new LOD
+            {
+                renderers = new Renderer[] {renderer},
+                screenRelativeTransitionHeight = i < count-1 ? lodStep*(count-i-1) : 0.05f
+            };
+            newLods.Add(newLOD);
+        }
+        
+        if (!TryGetComponent(out LODGroup lodGroup))
+            lodGroup = gameObject.AddComponent<LODGroup>();
+        
+        lodGroup.SetLODs(newLods.ToArray());
+        lodGroup.RecalculateBounds();
     }
     /// <summary>
     /// For each GameObject in lodVariantsList clears mesh and calls DestroyImmediate().
     /// Clears lodVariantsList
     /// </summary>
-    public void DestroyLODgameObjects()
+    public void DestroyLODGameObjects()
     {
-        foreach (GameObject lodVariantGO in lodVariantsList)
+        foreach (var lodVariantGO in lodVariantsList)
         {
             if (lodVariantGO != null)
             {

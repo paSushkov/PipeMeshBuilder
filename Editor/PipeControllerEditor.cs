@@ -331,15 +331,20 @@ public class PipeControllerEditor : Editor
                         EditorGUILayout.EndHorizontal();
                     }
 
-                    if (GUILayout.Button("Generate LOD"))
+                    EditorGUI.BeginDisabledGroup(controller.lodVariantsCount > 8);
+                    if (GUILayout.Button("Generate and assign LOD"))
                     {
-                        controller.GenerateLODmeshes(controller.lodDecreaseStep, controller.lodVariantsCount);
-                        controller.InstantiateLODGameobjects(controller.lodVariantsCount);
+                        controller.GenerateLODMeshes(controller.lodDecreaseStep, controller.lodVariantsCount);
+                        controller.InstantiateLODGameObjects(controller.lodVariantsCount);
                     }
+                    EditorGUI.EndDisabledGroup();
+                    if (controller.lodVariantsCount > 8)
+                        EditorGUILayout.HelpBox("Default LOD-group component cant hold more than 8 LOD-variants", MessageType.Warning);
+                    
 
                     if (GUILayout.Button("Immediate destroy LODs GameObjets"))
                     {
-                        controller.DestroyLODgameObjects();
+                        controller.DestroyLODGameObjects();
                     }
 
                     DrawUILine(Color.grey);
