@@ -89,11 +89,11 @@ public class PipeController : MonoBehaviour
         private set => centerLinesList = value;
     }
 
-    public Vector2 uvTilingInner;
+    public Vector2 uvTilingInner = new Vector2(1f, 1f);
     public Vector2 uvOffsetInner;
-    public Vector2 uvTilingOuter;
+    public Vector2 uvTilingOuter = new Vector2(1f, 1f);
     public Vector2 uvOffsetOuter;
-    public Vector2 uvTilingEdges;
+    public Vector2 uvTilingEdges = new Vector2(1f, 1f);
     public Vector2 uvOffsetEdges;
     
     public bool displayCenterLine = true;
