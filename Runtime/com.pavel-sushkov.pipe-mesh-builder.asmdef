@@ -1,5 +1,5 @@
 {
-    "name": "PipeMeshBuilder",
+    "name": "com.pavel-sushkov.pipe-mesh-builder",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -75,8 +75,9 @@ namespace PipeBuilder.Utility
             }
             UnityEditor.EditorUtility.ClearProgressBar();
             return new SaveResult(true, Error.None);
-#endif
+#else
             return new SaveResult(false, Error.NonEditor);
+#endif
 
         }
     }

@@ -1,5 +1,5 @@
 {
-  "name": "com.pavel_sushkov.pipe_mesh_builder",
+  "name": "com.pavel-sushkov.pipe-mesh-builder",
   "version": "2.0.0",
   "displayName": "PipeMeshBuilder",
   "keywords": [
@@ -22,6 +22,5 @@
       "description": "Some samples",
       "path": "Samples~/Sample1"
     }
-  ],
-  "type": "tool"
+  ]
 }

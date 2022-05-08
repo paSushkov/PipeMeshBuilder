@@ -1,5 +1,5 @@
 {
-    "name": "PipeMeshBuilder.Editor",
+    "name": "com.pavel-sushkov.pipe-mesh-builder.Editor",
     "references": [
         "GUID:6656fc3c669f11d46af9544857a0e396"
     ],
