@@ -1,12 +1,13 @@
 {
   "name": "com.pavel_sushkov.pipe_mesh_builder",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "displayName": "PipeMeshBuilder",
   "keywords": [
     "Procedural",
     "Mesh",
     "Pipe",
-    "Tube"
+    "Tube",
+    "LOD"
   ],
   "author": {
     "name": "Pavel Sushkov",
