@@ -22,5 +22,6 @@
       "description": "Some samples",
       "path": "Samples~/Sample1"
     }
-  ]
+  ],
+  "type": "tool"
 }

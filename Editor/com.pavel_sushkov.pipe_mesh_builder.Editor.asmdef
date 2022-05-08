@@ -1,25 +1,12 @@
 {
-    "name": "PipeBuilder.Editor",
+    "name": "PipeMeshBuilder.Editor",
     "references": [
-        "com.pavel_sushkov.pipe_mesh_builder"
+        "GUID:6656fc3c669f11d46af9544857a0e396"
     ],
-    "includePlatforms": [],
-    "excludePlatforms": [
-        "Android",
-        "iOS",
-        "LinuxStandalone64",
-        "Lumin",
-        "macOSStandalone",
-        "PS4",
-        "Stadia",
-        "Switch",
-        "tvOS",
-        "WSA",
-        "WebGL",
-        "WindowsStandalone32",
-        "WindowsStandalone64",
-        "XboxOne"
+    "includePlatforms": [
+        "Editor"
     ],
+    "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
