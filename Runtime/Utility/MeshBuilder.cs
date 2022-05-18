@@ -48,6 +48,7 @@ namespace PipeBuilder.Utility
         private static List<Vector3> verticesCache = new List<Vector3>();
         private static List<int> trinanglesCache = new List<int>();
         private static List<Vector2> uvCache = new List<Vector2>();
+        private static List<Vector3> normalsCache = new List<Vector3>();
         private static List<Material> materials = new List<Material>();
         
         public static void GeneratePipeMesh(MeshBuildParams buildParams, Mesh mesh)
@@ -55,11 +56,14 @@ namespace PipeBuilder.Utility
             verticesCache.Clear();
             trinanglesCache.Clear();
             uvCache.Clear();
+            normalsCache.Clear();
+            
             buildParams.circleDetail++;
             var uvPropertis = buildParams.uvProperties;
             if (buildParams.generateOuterSide)
             {
                 GenerateOuterVertices(buildParams.controlLine, buildParams.circleDetail, buildParams.rotaion, verticesCache);
+                GenerateOuterNormals(buildParams.controlLine, buildParams.circleDetail, verticesCache, 0, normalsCache);
                 GenerateOuterTriangles(buildParams.controlLine, buildParams.circleDetail, 0, trinanglesCache);
                 GenerateOuterBaseUV(buildParams.controlLine, buildParams.circleDetail, uvCache);
                 ApplyTilingAndOffset(uvCache, uvPropertis.outerTiling, uvPropertis.outerOffset, 0, uvCache.Count);
@@ -74,6 +78,8 @@ namespace PipeBuilder.Utility
             {
                 var offset = verticesCache.Count;
                 GenerateInnerVertices(buildParams.controlLine, buildParams.circleDetail, buildParams.rotaion, verticesCache);
+                GenerateInnerNormals(buildParams.controlLine, buildParams.circleDetail, verticesCache, offset, normalsCache);
+
                 GenerateInnerTriangles(buildParams.controlLine, buildParams.circleDetail, offset, trinanglesCache); 
                 GenerateInnerBaseUV(buildParams.controlLine, buildParams.circleDetail, uvCache);
                 ApplyTilingAndOffset(uvCache, uvPropertis.innerTiling, uvPropertis.innerOffset, offset, uvCache.Count);
@@ -88,6 +94,7 @@ namespace PipeBuilder.Utility
             {
                 var offset = verticesCache.Count;
                 GenerateEdgesVertices(buildParams.controlLine, buildParams.circleDetail, buildParams.rotaion, verticesCache);
+                GenerateEdgeNormals(buildParams.controlLine, buildParams.circleDetail, normalsCache);
                 GenerateEdgesTriangles(buildParams.circleDetail, offset, trinanglesCache);
                 GenerateEdgesUV(buildParams.controlLine, buildParams.circleDetail, uvCache);
                 ApplyTilingAndOffset(uvCache, uvPropertis.edgeTiling, uvPropertis.edgeOffset, offset, uvCache.Count);
@@ -101,8 +108,7 @@ namespace PipeBuilder.Utility
             mesh.SetVertices(verticesCache);
             mesh.SetTriangles(trinanglesCache, 0);
             mesh.SetUVs(0, uvCache);
-
-            mesh.RecalculateNormals();
+            mesh.SetNormals(normalsCache);
             mesh.RecalculateTangents();
             mesh.RecalculateBounds();
             mesh.Optimize();
@@ -119,6 +125,7 @@ namespace PipeBuilder.Utility
             mesh.subMeshCount = materials.Count;
             verticesCache.Clear();
             uvCache.Clear();
+            normalsCache.Clear();
 
             var parentRotation = parent.rotation;
             var parentScale = parent.localScale;
@@ -141,6 +148,7 @@ namespace PipeBuilder.Utility
                     var vertex = lod.GameObject.transform.TransformPoint(lodMesh.vertices[ii]);
                     vertex = parent.InverseTransformPoint(vertex);
                     verticesCache.Add(vertex);
+                    normalsCache.Add(lodMesh.normals[ii]);
                 }
 
                 for (var ii = 0; ii < lodMesh.triangles.Length; ii++)
@@ -149,6 +157,7 @@ namespace PipeBuilder.Utility
             }
             
             mesh.SetVertices(verticesCache);
+            mesh.SetNormals(normalsCache);
             for (var i = 0; i < materials.Count; i++)
             {
                 var triangles = trianglesArray[i];
@@ -156,7 +165,6 @@ namespace PipeBuilder.Utility
                 mesh.SetUVs(0,uvCache);
             }
             
-            mesh.RecalculateNormals();
             mesh.RecalculateTangents();
             mesh.RecalculateBounds();
             mesh.Optimize();
@@ -201,6 +209,54 @@ namespace PipeBuilder.Utility
                 var rotation = Quaternion.AngleAxis(angleStep * i + extraRotation, forward).normalized;
                 var offset = rotation * up * radius;
                 result.Add(chordeNode.LocalPosition + offset);
+            }
+        }
+
+        private static void GenerateOuterNormals(ControlLine controlLine, int circleDetail, List<Vector3> vertices, int offset, List<Vector3> result)
+        {
+            GenerateLenghtNormals(controlLine, circleDetail, false, vertices, offset, result);
+        }
+
+        private static void GenerateInnerNormals(ControlLine controlLine, int circleDetail, List<Vector3> vertices, int offset, List<Vector3> result)
+        {
+            GenerateLenghtNormals(controlLine, circleDetail, true, vertices, offset, result);
+        }
+
+        private static void GenerateLenghtNormals(ControlLine controlLine, int circleDetail, bool inner,List<Vector3> vertices, int offset, List<Vector3> result)
+        {
+            var controlNodes = controlLine.ControlNodes;
+            var vertexIndex = 0;
+            for (var i = 0; i < controlNodes.Count; i++)
+            {
+                var chordeNodes = controlNodes[i].ChordeNodes;
+                for (var ii = 0; ii < chordeNodes.Count; ii++)
+                {
+                    var nodePosition = chordeNodes[ii].LocalPosition;
+                    for (var iii = 0; iii < circleDetail; iii++, vertexIndex++)
+                    {
+                        var vertex = vertices[vertexIndex + offset];
+                        var normal = inner ? (nodePosition-vertex).normalized : (vertex - nodePosition).normalized;
+                        result.Add(normal);
+                    }
+                }
+            }
+        }
+
+        private static void GenerateEdgeNormals(ControlLine controlLine, int circleDetail, List<Vector3> result) 
+        {
+            var node = controlLine.GetChordeNode(0);
+            GenerateEdgeNormals(node, circleDetail, true, result);
+            var lastControlNode = controlLine.ControlNodes[controlLine.ControlNodes.Count - 1];
+            node = lastControlNode.ChordeNodes[lastControlNode.ChordeNodes.Count - 1];
+            GenerateEdgeNormals(node, circleDetail, false, result);
+        }
+
+        private static void GenerateEdgeNormals(ChordeNode chordeNode, int circleDetail, bool first, List<Vector3> result)
+        {
+            var direction = first ? -chordeNode.Forward : chordeNode.Forward;
+            for (var i = 0; i < circleDetail * 2; i++)
+            {
+                result.Add(direction);
             }
         }
 
