@@ -86,7 +86,6 @@ namespace PipeBuilder.Editor.Menus
         {
             if (allowEdit)
             {
-                Handles.SphereHandleCap(-1, pipeBuilder.transform.position, Quaternion.identity, 0.5f, EventType.Repaint);
                 HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
                 DrawControlLineAndNodes(pipeBuilder.ControlLine, settings.DrawSettings);
             }
@@ -178,6 +177,7 @@ namespace PipeBuilder.Editor.Menus
         private void DrawChordeDiscs(ControlLine line, DrawSettings settings)
         {
             var colorCache = Handles.color;
+            var handleColor = new Color();
             var transform = pipeBuilder.transform;
             for (var i = 0; i < line.ControlNodes.Count; i++)
             {
@@ -187,13 +187,19 @@ namespace PipeBuilder.Editor.Menus
                     var node = controlNode.ChordeNodes[ii];
                     Handles.color = settings.chordeLineCircleColor;
                     Handles.DrawWireDisc(node, transform.TransformDirection(node.Forward), settings.chordeLineCircleSize);
-                    Handles.color = Color.green;
+                    handleColor = Color.green;
+                    handleColor.a = settings.chordeLineCircleColor.a;
+                    Handles.color = handleColor;
                     var endPos = node + transform.TransformDirection(node.Up) * settings.chordeLineCircleSize; 
                     Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, 6f, node, endPos);
-                    Handles.color = Color.blue;
+                    handleColor = Color.blue;
+                    handleColor.a = settings.chordeLineCircleColor.a;
+                    Handles.color = handleColor;
                     endPos = node + transform.TransformDirection(node.Forward) * settings.chordeLineCircleSize; 
                     Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, 6f, node, endPos);
-                    Handles.color = Color.red;
+                    handleColor = Color.red;
+                    handleColor.a = settings.chordeLineCircleColor.a;
+                    Handles.color = handleColor;
                     endPos = node + transform.TransformDirection(node.Right) * settings.chordeLineCircleSize; 
                     Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture, 6f, node, endPos);
                 }
@@ -374,7 +380,7 @@ namespace PipeBuilder.Editor.Menus
             var turnRadius = defaultSettings.TurnRadius;
             
             EditorGUI.BeginChangeCheck();
-            turnRadius = EditorGUILayout.Slider("Default turn radius:", turnRadius, 0.1f, 50f);
+            turnRadius = EditorGUILayout.Slider("Default turn radius:", turnRadius, 0.001f, 50f);
             if (EditorGUI.EndChangeCheck() && controlLine.IsNewDefaultTurnRadiusAllowed(turnRadius))
             {
                 defaultSettings.TurnRadius = turnRadius;
@@ -492,7 +498,7 @@ namespace PipeBuilder.Editor.Menus
                 {
                     var turnRadius = node.TurnRadius;
                     EditorGUI.BeginChangeCheck();
-                    turnRadius = EditorGUILayout.Slider("Turn radius", turnRadius, 0.1f, 150f);
+                    turnRadius = EditorGUILayout.Slider("Turn radius", turnRadius, 0.001f, 150f);
                     if (EditorGUI.EndChangeCheck() &&
                         pipeBuilder.ControlLine.IsTurnRadiusAllowedForNode(turnRadius, node))
                     {
@@ -545,7 +551,7 @@ namespace PipeBuilder.Editor.Menus
             DrawUILine(Color.grey);
 
             drawSettings.controlLineWidth =
-                EditorGUILayout.Slider("Size of Control Line ", drawSettings.controlLineWidth, 0.1f, 100f);
+                EditorGUILayout.Slider("Size of Control Line ", drawSettings.controlLineWidth, 0.001f, 10f);
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Color of Control Line:");
             drawSettings.controlLineColor = EditorGUILayout.ColorField(drawSettings.controlLineColor);
@@ -554,7 +560,7 @@ namespace PipeBuilder.Editor.Menus
             DrawUILine(Color.grey);
 
             drawSettings.controlNodesSize =
-                EditorGUILayout.Slider("Size of Control Nodes ", drawSettings.controlNodesSize, 0.1f, 5f);
+                EditorGUILayout.Slider("Size of Control Nodes ", drawSettings.controlNodesSize, 0.001f, 5f);
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Color of Control Nodes:");
             drawSettings.controlNodesColor = EditorGUILayout.ColorField(drawSettings.controlNodesColor);
@@ -563,7 +569,7 @@ namespace PipeBuilder.Editor.Menus
             DrawUILine(Color.grey);
 
             drawSettings.chordeLineWidth =
-                EditorGUILayout.Slider("Size of Chorde Line ", drawSettings.chordeLineWidth, 0.1f, 100f);
+                EditorGUILayout.Slider("Size of Chorde Line ", drawSettings.chordeLineWidth, 0.001f, 10f);
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Color of Chorde Line:");
             drawSettings.chordeLineColor = EditorGUILayout.ColorField(drawSettings.chordeLineColor);
@@ -572,7 +578,7 @@ namespace PipeBuilder.Editor.Menus
             DrawUILine(Color.grey);
 
             drawSettings.chordeNodesSize =
-                EditorGUILayout.Slider("Size of Chorde Line Nodes", drawSettings.chordeNodesSize, 0.1f, 5f);
+                EditorGUILayout.Slider("Size of Chorde Line Nodes", drawSettings.chordeNodesSize, 0.001f, 5f);
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Color of Chorde Line Nodes:");
             drawSettings.chordeNodesColor = EditorGUILayout.ColorField(drawSettings.chordeNodesColor);
@@ -581,7 +587,7 @@ namespace PipeBuilder.Editor.Menus
             DrawUILine(Color.grey);
 
             drawSettings.chordeLineCircleSize =
-                EditorGUILayout.Slider("Size of circles", drawSettings.chordeLineCircleSize, 0.1f, 100f);
+                EditorGUILayout.Slider("Size of circles", drawSettings.chordeLineCircleSize, 0.001f, 10f);
             GUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel("Color of circles:");
             drawSettings.chordeLineCircleColor = EditorGUILayout.ColorField(drawSettings.chordeLineCircleColor);

@@ -24,8 +24,8 @@ namespace PipeBuilder.PipeSettings
             get => innerRadius;
             set
             {
-                if (value < outerRadius && value > 0.1)
-                innerRadius = value;
+                if (value < outerRadius)
+                    innerRadius = value;
             }
         }
         

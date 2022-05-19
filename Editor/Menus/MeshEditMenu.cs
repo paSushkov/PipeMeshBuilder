@@ -70,15 +70,14 @@ namespace PipeBuilder.Editor.Menus
         {
             DrawControlNodes(pipeBuilder.ControlLine, settings.DrawSettings);
             DrawChordeLineAndNodes(pipeBuilder, settings.DrawSettings);
-            DrawNodesInfo(pipeBuilder.ControlLine);
         }
 
         private void DrawDefaultRadiusSettings(PipeBuilder pipeBuilder)
         {
             var radiusSettings = pipeBuilder.DefaultControlLineRadiusSettings;
             EditorGUI.BeginChangeCheck();
-            radiusSettings.OuterRadius = EditorGUILayout.Slider("Outer radius", radiusSettings.OuterRadius, 0f, 30f);
-            radiusSettings.InnerRadius = EditorGUILayout.Slider("Inner radius", radiusSettings.InnerRadius, 0f, 30f);
+            radiusSettings.OuterRadius = EditorGUILayout.Slider("Outer radius", radiusSettings.OuterRadius, 0f, 10f);
+            radiusSettings.InnerRadius = EditorGUILayout.Slider("Inner radius", radiusSettings.InnerRadius, 0f, 10f);
             pipeBuilder.rotation = EditorGUILayout.Slider("Extra rotation", pipeBuilder.rotation, -180f, 180f);
             if (EditorGUI.EndChangeCheck())
             {
@@ -117,8 +116,8 @@ namespace PipeBuilder.Editor.Menus
                 if (!useDefault)
                 {
                     EditorGUI.BeginChangeCheck();
-                    node.OuterRadius = EditorGUILayout.Slider("Outer radius", node.OuterRadius, 0f, 30f);
-                    node.InnerRadius = EditorGUILayout.Slider("Inner radius", node.InnerRadius, 0f, 30f);
+                    node.OuterRadius = EditorGUILayout.Slider("Outer radius", node.OuterRadius, 0f, 10f);
+                    node.InnerRadius = EditorGUILayout.Slider("Inner radius", node.InnerRadius, 0f, 10f);
                     if (EditorGUI.EndChangeCheck())
                     {
                         if (pipeBuilder.drawGizmosMesh || pipeBuilder.previewMeshFilter)
@@ -198,21 +197,10 @@ namespace PipeBuilder.Editor.Menus
                 Handles.SphereHandleCap(-1, controlNode.Position, Quaternion.identity, drawSettings.controlNodesSize, EventType.Repaint);
 
                 Handles.Label(nodes[i], $"Node {i}" +
-                                        $"\nInner r: {nodes[i].InnerRadius.ToString("0.00")}" +
-                                        $"\nOuter r: {nodes[i].InnerRadius.ToString("0.00")}", LabelStyle);
+                                        $"\nInner r: {nodes[i].InnerRadius}" +
+                                        $"\nOuter r: {nodes[i].OuterRadius}", LabelStyle);
             }
             Handles.color = colorCache;
-        }
-        
-        private void DrawNodesInfo(ControlLine controlLine)
-        {
-            var nodes = controlLine.ControlNodes;
-            for (var i = 0; i < controlLine.ControlNodes.Count; i++)
-            {
-                Handles.Label(nodes[i], $"Node {i}" +
-                                        $"\nInner r: {nodes[i].InnerRadius.ToString("0.00")}" +
-                                        $"\nOuter r: {nodes[i].InnerRadius.ToString("0.00")}", LabelStyle);
-            }
         }
     }
 }
