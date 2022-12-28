@@ -53,6 +53,7 @@ namespace PipeBuilder.Editor
             if (pipeBuilder.Initialized)
             {
                 pipeBuilder.RecalculateLODsInfo();
+                pipeBuilder.RebuildPreviewMesh();
                 return;
             }
 

@@ -42,6 +42,7 @@ namespace PipeBuilder.Editor.Menus
             var needPreview = pipeBuilder.drawGizmosMesh || pipeBuilder.drawGizmosWireMesh;
             
             EditorGUI.BeginChangeCheck();
+            pipeBuilder.alwaysDrawGizmo = GUILayout.Toggle(pipeBuilder.alwaysDrawGizmo, "Always draw gizmo");
             
             GUILayout.BeginHorizontal();
             pipeBuilder.drawGizmosMesh = GUILayout.Toggle(pipeBuilder.drawGizmosMesh, "Gizmo", "Button", GUILayout.Width(80));

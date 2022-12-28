@@ -23,7 +23,8 @@ namespace PipeBuilder
         public string meshPath;
         public Color previewMeshColor = new Color(0f, 1f, 0f, 0.33f);
         public Color previewWireMeshColor = new Color(0f, 1f, 0f, 1f);
-
+        public bool alwaysDrawGizmo = false;
+        
         [NonSerialized] public Mesh previewMesh;
         
         [SerializeField] private ControlNodeTurnSettings defaultControlLineTurnSettings;
@@ -280,7 +281,13 @@ namespace PipeBuilder
                 lodElementsCache[i].Destroy();
             lodElementsCache.Clear();
         }
-        
+
+        private void OnDrawGizmos()
+        {
+            if (alwaysDrawGizmo)
+                OnDrawGizmosSelected();
+        }
+
         private void OnDrawGizmosSelected()
         {
             if (!previewMesh || (!drawGizmosMesh && !drawGizmosWireMesh))
