@@ -237,6 +237,9 @@ namespace PipeBuilder.Editor.Menus
                 AllowDeleteControlPoints(pipeBuilder, drawSettings, guiEvent);
             else
                 MoveControlPoints(pipeBuilder);
+            
+            if (guiEvent.control || guiEvent.shift)
+                SceneView.RepaintAll();
         }
 
         private void MoveControlPoints(PipeBuilder pipeBuilder)
