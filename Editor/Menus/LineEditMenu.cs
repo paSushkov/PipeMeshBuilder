@@ -9,7 +9,6 @@ namespace PipeBuilder.Editor.Menus
     public class LineEditMenu : PipeEditMenu
     {
         private const float CameraInputMaxDistance = 1500f;
-        private const float CursorInputTolerance = 0.75f;
 
         private bool allowEdit;
         private GUIStyle labelStyle;
@@ -271,7 +270,7 @@ namespace PipeBuilder.Editor.Menus
             {
                 line = controlLine,
                 maxCameraDistance = CameraInputMaxDistance,
-                cursorTolerance = CursorInputTolerance
+                cursorTolerance = settings.CursorInputTolerance
             };
             var pointOnLineResult = TryGetPointOnLine(request);
             if (!pointOnLineResult.pointExists)
@@ -321,7 +320,7 @@ namespace PipeBuilder.Editor.Menus
             {
                 line = controlLine,
                 maxCameraDistance = CameraInputMaxDistance,
-                cursorTolerance = CursorInputTolerance
+                cursorTolerance = settings.CursorInputTolerance
             };
             var pointOnLineResult = TryGetPointOnLine(request);
             if (!pointOnLineResult.pointExists)
@@ -329,7 +328,7 @@ namespace PipeBuilder.Editor.Menus
             var nodes = controlLine.ControlNodes;
             var index = pointOnLineResult.closestIndex;
             var closestNode = nodes[index];
-            if (Vector3.Distance(pointOnLineResult.position, closestNode) > CursorInputTolerance)
+            if (Vector3.Distance(pointOnLineResult.position, closestNode) > settings.CursorInputTolerance)
                 return;
             
             var colorCache = Handles.color;
@@ -573,6 +572,7 @@ namespace PipeBuilder.Editor.Menus
 
             settings.RotationMode =
                 (PivotRotationMode) EditorGUILayout.EnumPopup("Rotation mode", settings.RotationMode);
+            settings.CursorInputTolerance = EditorGUILayout.Slider("Cursor tolerance",settings.CursorInputTolerance, 0f, 1f);
 
             DrawUILine(Color.grey);
 
