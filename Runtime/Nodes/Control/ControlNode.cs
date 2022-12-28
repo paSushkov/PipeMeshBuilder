@@ -14,8 +14,7 @@ namespace PipeBuilder.Nodes
         [SerializeField] protected ControlNodeRadiusSettings customRadiusSettings; 
         [SerializeField] protected float angleBetweenNeighbors = 180f;
         [SerializeField] protected float turnArcAngle = 180f;
-        [SerializeField] protected Vector3 turnArcCenterPos;
-        [SerializeField] protected Vector3 turnArcCenterPosLocal;
+        [SerializeField] protected Vector3 turnArcCenter;
         [SerializeField] protected float turnArcCenterDistance = 0f;
         [SerializeField] protected float padding = 0f;
         [SerializeField] protected List<ChordeNode> chordeNodes;
@@ -65,16 +64,10 @@ namespace PipeBuilder.Nodes
         public ControlNodeTurnSettings DefaultTurnSettings => Builder.DefaultControlLineTurnSettings;
         public ControlNodeRadiusSettings DefaultRadiusSettings => Builder.DefaultControlLineRadiusSettings;
 
-        public Vector3 TurnArcCenterPos
+        public Vector3 TurnArcCenter
         {
-            get => turnArcCenterPos;
-            set => AssignTurnArcCenterPosition(value);
-        }
-        
-        public Vector3 TurnArcCenterPosLocal
-        {
-            get => turnArcCenterPosLocal;
-            set => AssignTurnArcCenterPositionLocal(value);
+            get => turnArcCenter;
+            set => AssignTurnArcCenter(value);
         }
 
         private ControlNodeTurnSettings TurnSettings => UseDefaultTurnSettings ? DefaultTurnSettings : customTurnSettings;
@@ -108,16 +101,9 @@ namespace PipeBuilder.Nodes
             return padding;
         }
 
-        public void AssignTurnArcCenterPosition(Vector3 position)
+        public void AssignTurnArcCenter(Vector3 vector)
         {
-            turnArcCenterPos = position;
-            turnArcCenterPosLocal = pipeBuilder.transform.InverseTransformPoint(position);
-        }
-        
-        public void AssignTurnArcCenterPositionLocal(Vector3 position)
-        {
-            turnArcCenterPosLocal = position;
-            turnArcCenterPos = pipeBuilder.transform.TransformPoint(position);
+            turnArcCenter = vector;
         }
 
         public void AssignAngleBetweenNeighbors(float value)
@@ -168,27 +154,6 @@ namespace PipeBuilder.Nodes
                 padding = TurnArcCenterDistance * Mathf.Cos(halfAngle * Mathf.Deg2Rad);
                 turnArcAngle = 180f - angleBetweenNeighbors;
             }
-        }
-
-        public override void AssignPosition(Vector3 value)
-        {
-            base.AssignPosition(value);
-            for (var i = 0; i < ChordeNodes.Count; i++)
-            {
-                var chordeNode = ChordeNodes[i];
-                chordeNode.AssignLocalPosition(chordeNode.LocalPosition);
-            }
-        }
-
-        public override void AssignLocalPosition(Vector3 value)
-        {
-            base.AssignLocalPosition(value);
-            for (var i = 0; i < ChordeNodes.Count; i++)
-            {
-                var chordeNode = ChordeNodes[i];
-                chordeNode.AssignLocalPosition(chordeNode.LocalPosition);
-            }
-
         }
     }
 }

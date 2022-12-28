@@ -23,7 +23,6 @@ namespace PipeBuilder.Editor.Menus
 
         public override void DrawInspector()
         {
-            
             DrawAskForWirePreviewMesh();
             DrawSaveButton();
             
@@ -122,7 +121,6 @@ namespace PipeBuilder.Editor.Menus
 
                 builder.meshPath = Path.GetDirectoryName(path).Substring(Application.dataPath.Length);
                 EditorUtility.SetDirty(builder);
-                
                 GUIUtility.ExitGUI();
             }
         }

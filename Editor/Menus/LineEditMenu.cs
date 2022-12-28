@@ -75,6 +75,11 @@ namespace PipeBuilder.Editor.Menus
             DrawControlLineSettings(pipeBuilder.ControlLine);
             DrawDefaultControlNodesSettings(pipeBuilder);
 
+            if (GUILayout.Button("Pivot to center"))
+            {
+                pipeBuilder.PivotToMeshCenter();
+            }
+            
             manualEdit = GUILayout.Toggle(manualEdit, "Control nodes", "Button");
             if (manualEdit)
                 DrawControlNodesManualEdit(pipeBuilder);
@@ -449,7 +454,25 @@ namespace PipeBuilder.Editor.Menus
             for (var i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
+                GUILayout.BeginHorizontal();
                 GUILayout.Label($"Node[{i}] {nodes[i].AngleBetweenNeighbors.ToString("0.00")}\u00B0");
+                if (GUILayout.Button("To pivot"))
+                {
+                    pipeBuilder.MoveControlNodeToPivot(i);
+                    
+                    if (pipeBuilder.drawGizmosMesh || pipeBuilder.previewMeshFilter)
+                        pipeBuilder.RebuildPreviewMesh();
+                    EditorUtility.SetDirty(pipeBuilder);
+                }                
+                if (GUILayout.Button("Set pivot"))
+                {
+                    pipeBuilder.SetNodeAsPivot(i);
+                    if (pipeBuilder.drawGizmosMesh || pipeBuilder.previewMeshFilter)
+                        pipeBuilder.RebuildPreviewMesh();
+                    EditorUtility.SetDirty(pipeBuilder);
+                }
+
+                GUILayout.EndHorizontal();
 
                 var global = node.Position;
                 var local = node.LocalPosition;

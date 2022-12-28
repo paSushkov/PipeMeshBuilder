@@ -21,8 +21,7 @@ namespace PipeBuilder
         public MeshFilter previewMeshFilter;
         public string meshPath;
         
-        [NonSerialized] 
-        public Mesh previewMesh;
+        [NonSerialized] public Mesh previewMesh;
         
         [SerializeField] private ControlNodeTurnSettings defaultControlLineTurnSettings;
         [SerializeField] private ControlNodeRadiusSettings defaultControlLineRadiusSettings;
@@ -198,6 +197,37 @@ namespace PipeBuilder
             }
         }
 
+        public void MoveControlNodeToPivot(int index)
+        {
+            ControlLine.ControlNodeToPivot(index);
+            ControlLine.RebuildChordeNodes();
+        }
+        
+        public void SetNodeAsPivot(int index)
+        {
+            ControlLine.SetNodeAsPivot(index);
+            ControlLine.RebuildChordeNodes();
+        }
+
+        public void PivotToMeshCenter()
+        {
+            if (!previewMesh)
+                RebuildPreviewMesh();
+            
+            var boundsCenter= previewMesh.bounds.center;
+            var direction = transform.TransformVector(boundsCenter);
+            ControlLine.MoveNodes(-direction);
+            ControlLine.RebuildChordeNodes();
+            transform.position += direction;   
+            if (drawGizmosMesh || previewMeshFilter)
+                RebuildPreviewMesh();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.EditorUtility.SetDirty(transform);
+#endif
+        }
+
         private void InitializeControlLine()
         {
             if (controlLine is null)
@@ -247,7 +277,7 @@ namespace PipeBuilder
                 lodElementsCache[i].Destroy();
             lodElementsCache.Clear();
         }
-
+        
         private void OnDrawGizmosSelected()
         {
             if (!drawGizmosMesh || !previewMesh)

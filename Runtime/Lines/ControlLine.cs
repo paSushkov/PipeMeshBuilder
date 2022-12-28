@@ -372,6 +372,15 @@ namespace PipeBuilder.Lines
             return IsMovingAllowed(index, newPosition, worldSpace);
         }
 
+        public void MoveNodes(Vector3 direction)
+        {
+            for (var i = 0; i < ControlNodes.Count; i++)
+            {
+                var node = ControlNodes[i];
+                node.AssignPosition(node.Position+direction);
+            }
+        }
+
         #endregion
 
 
@@ -382,16 +391,16 @@ namespace PipeBuilder.Lines
             var node = ControlNodes[index];
             if (index == 0 || index == ControlNodes.Count - 1 || node.AngleBetweenNeighbors % 180f == 0f)
             {
-                node.TurnArcCenterPos = node.Position;
+                node.TurnArcCenter = Vector3.zero;
                 node.Recalculate();
             }
 
             else
             {
-                var toPrevious = (ControlNodes[index - 1].Position - node.Position).normalized;
-                var toNext = (ControlNodes[index + 1].Position - node.Position).normalized;
+                var toPrevious = (ControlNodes[index - 1].LocalPosition - node.LocalPosition).normalized;
+                var toNext = (ControlNodes[index + 1].LocalPosition - node.LocalPosition).normalized;
                 var toTurnCenter = (toPrevious + toNext).normalized;
-                node.TurnArcCenterPos = node.Position + toTurnCenter * node.TurnArcCenterDistance;
+                node.TurnArcCenter = toTurnCenter * node.TurnArcCenterDistance;
                 node.Recalculate();
             }
         }
@@ -498,6 +507,26 @@ namespace PipeBuilder.Lines
             RebuildFirstChordeNodeNormals();
         }
 
+        public void ControlNodeToPivot(int nodeIndex)
+        {
+            var movement = ControlNodes[nodeIndex].Position-pipeBuilder.transform.position;
+            for (var i = 0; i < ControlNodes.Count; i++)
+            {
+                var node = ControlNodes[i];
+                node.AssignPosition(node.Position-movement);
+            }
+        }
+
+        public void SetNodeAsPivot(int nodeIndex)
+        {
+            var movement = ControlNodes[nodeIndex].Position-pipeBuilder.transform.position;
+            pipeBuilder.transform.position += movement;
+            ControlNodeToPivot(nodeIndex);
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(pipeBuilder.transform);
+#endif
+        }
+
         private void RebuildChordeNodesForMid(int index)
         {
             Vector3 forward;
@@ -529,7 +558,7 @@ namespace PipeBuilder.Lines
             }
             else if (cornerDetail == 1)
             {
-                var fromNodeToArcCenter = (controlNode.TurnArcCenterPos-controlNode.Position).normalized;
+                var fromNodeToArcCenter = controlNode.TurnArcCenter.normalized;
                 
                 up = -fromNodeToArcCenter.normalized;
                 forward = Vector3.Cross(fromNodeToArcCenter, baseNormal.normalized).normalized;
@@ -552,17 +581,20 @@ namespace PipeBuilder.Lines
             // We need to add a bunch of CentralLineNodes, which will form an arc
             else
             {
+                var globalTurnCenter = pipeBuilder.transform.TransformDirection(controlNode.TurnArcCenter) +
+                                       controlNode.Position;
+                
                 var startDirection = (prevControlNode.Position - controlNode.Position).normalized;
                 var startPosition = controlNode.Position+ startDirection* controlNode.Padding;
                 var radius = controlNode.TurnRadius;
-                var rotatingVector = (startPosition - controlNode.TurnArcCenterPos).normalized * radius;
+                var rotatingVector = (startPosition - globalTurnCenter).normalized * radius;
                 var angleStep = controlNode.TurnArcAngle / (cornerDetail - 1);
                 var lastChordeOfPrevControl = lastChordeNode;
                 for (var j = 0; j < cornerDetail; j++)
                 {
 
                     var rotatedVector = Quaternion.AngleAxis(angleStep * j, baseNormal) * rotatingVector;
-                    var position = controlNode.TurnArcCenterPos + rotatedVector;
+                    var position = globalTurnCenter + rotatedVector;
                     up = rotatedVector.normalized;
                     forward = Vector3.Cross(baseNormal.normalized, up);
 

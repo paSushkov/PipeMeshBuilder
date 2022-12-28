@@ -94,6 +94,7 @@ namespace PipeBuilder.Editor
             if (!pipeBuilder.transform.hasChanged)
                 return;
             pipeBuilder.UpdateGlobalPositions();
+            pipeBuilder.ControlLine.RebuildChordeNodes();
             EditorUtility.SetDirty(pipeBuilder);
             pipeBuilder.transform.hasChanged = false;
         }
