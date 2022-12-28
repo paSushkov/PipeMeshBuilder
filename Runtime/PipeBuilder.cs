@@ -18,9 +18,12 @@ namespace PipeBuilder
         public Material material;
         public UvProperties uvProperties = new UvProperties();
         public bool drawGizmosMesh = true;
+        public bool drawGizmosWireMesh = true;
         public MeshFilter previewMeshFilter;
         public string meshPath;
-        
+        public Color previewMeshColor = new Color(0f, 1f, 0f, 0.33f);
+        public Color previewWireMeshColor = new Color(0f, 1f, 0f, 1f);
+
         [NonSerialized] public Mesh previewMesh;
         
         [SerializeField] private ControlNodeTurnSettings defaultControlLineTurnSettings;
@@ -280,10 +283,26 @@ namespace PipeBuilder
         
         private void OnDrawGizmosSelected()
         {
-            if (!drawGizmosMesh || !previewMesh)
+            if (!previewMesh || (!drawGizmosMesh && !drawGizmosWireMesh))
                 return;
+            
+            var matrixCache = Gizmos.matrix;
             Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireMesh(previewMesh);
+            var gizmoColorCache = Gizmos.color;
+            if (drawGizmosMesh)
+            {
+                Gizmos.color = previewMeshColor;
+                Gizmos.DrawMesh(previewMesh);
+            }
+            
+            if (drawGizmosWireMesh)
+            {
+                Gizmos.color = previewWireMeshColor;
+                Gizmos.DrawWireMesh(previewMesh);
+            }
+
+            Gizmos.color = gizmoColorCache;
+            Gizmos.matrix = matrixCache;
         }
     }
 }

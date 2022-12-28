@@ -23,7 +23,7 @@ namespace PipeBuilder.Editor.Menus
 
         public override void DrawInspector()
         {
-            DrawAskForWirePreviewMesh();
+            DrawAskForGizmoPreviewMesh();
             DrawSaveButton();
             
             DrawAskForPreviewMesh();
@@ -37,13 +37,24 @@ namespace PipeBuilder.Editor.Menus
         
         #endregion
         
-        private void DrawAskForWirePreviewMesh()
+        private void DrawAskForGizmoPreviewMesh()
         {
+            var needPreview = pipeBuilder.drawGizmosMesh || pipeBuilder.drawGizmosWireMesh;
+            
             EditorGUI.BeginChangeCheck();
-            pipeBuilder.drawGizmosMesh = GUILayout.Toggle(pipeBuilder.drawGizmosMesh, "Draw gizmos mesh", "Button");
+            
+            GUILayout.BeginHorizontal();
+            pipeBuilder.drawGizmosMesh = GUILayout.Toggle(pipeBuilder.drawGizmosMesh, "Gizmo", "Button", GUILayout.Width(80));
+            pipeBuilder.previewMeshColor = EditorGUILayout.ColorField(pipeBuilder.previewMeshColor);
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            pipeBuilder.drawGizmosWireMesh = GUILayout.Toggle(pipeBuilder.drawGizmosWireMesh, "Wire", "Button", GUILayout.Width(80));
+            pipeBuilder.previewWireMeshColor = EditorGUILayout.ColorField(pipeBuilder.previewWireMeshColor);
+            GUILayout.EndHorizontal();
             if (EditorGUI.EndChangeCheck())
             {
-                if (pipeBuilder.drawGizmosMesh)
+                if (!needPreview && (pipeBuilder.drawGizmosMesh || pipeBuilder.drawGizmosWireMesh))
                     pipeBuilder.RebuildPreviewMesh();
                 EditorUtility.SetDirty(pipeBuilder);
             }

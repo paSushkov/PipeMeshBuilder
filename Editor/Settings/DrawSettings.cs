@@ -17,7 +17,7 @@ namespace PipeBuilder.Editor.Settings
 
         public Color chordeLineCircleColor;
         public float chordeLineCircleSize = 1f;
-
+        
         public void Load()
         {
             controlLineColor = GetColorFromString(EditorPrefs.GetString($"{GetType().FullName}_{nameof(controlLineColor)}", "0072FFC4"));
