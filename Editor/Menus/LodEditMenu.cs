@@ -1,4 +1,5 @@
-﻿using PipeBuilder.Editor.Settings;
+﻿using System.IO;
+using PipeBuilder.Editor.Settings;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace PipeBuilder.Editor.Menus
             DrawLodCount();
             DrawLodDegradeStep();
             GUILayout.BeginHorizontal();
-            AskForLodGenerate();
+            AskForLodGenerate(pipeBuilder);
             AskForLodsDestroy();
             GUILayout.EndHorizontal();
             AskForLodAssignment();
@@ -82,15 +83,25 @@ namespace PipeBuilder.Editor.Menus
             EditorGUI.indentLevel = 0;
         }
 
-        private void AskForLodGenerate()
+        private void AskForLodGenerate(PipeBuilder builder)
         {
             if (GUILayout.Button("Generate LODs"))
             {
                 var saveMeshes = EditorUtility.DisplayDialog("Pipe Builder", "Save meshes as assets?", "Yes", "No");
-                var path = string.Empty;
                 if (saveMeshes)
-                    path = EditorUtility.SaveFolderPanel("Pipe Builder - target folder", string.Empty, string.Empty);
-                pipeBuilder.GenerateLODs(path);
+                {
+                    var path = builder.meshPath ?? string.Empty;
+                    path = Path.GetFullPath(Application.dataPath + path);
+                    
+                    if (!Directory.Exists(path))
+                        path = Application.dataPath;
+                    path = EditorUtility.SaveFolderPanel("Pipe Builder - target folder", path, string.Empty);
+                    
+                    pipeBuilder.meshPath = path.Substring(Application.dataPath.Length);
+                    pipeBuilder.GenerateLODs(path);
+                }
+                else
+                    pipeBuilder.GenerateLODs(null);
                 EditorUtility.SetDirty(pipeBuilder);
                 GUIUtility.ExitGUI();
             }

@@ -10,6 +10,8 @@ namespace PipeBuilder
     public class PipeMeshCombiner : MonoBehaviour
     {
         public List<PipeBuilder> pipeBuilders = new List<PipeBuilder>();
+        public string meshPath;
+
         [SerializeField] private List<LodElement> lodElements = new List<LodElement>();
         [SerializeField] private List<LodElement> lodElementsCache = new List<LodElement>();
 

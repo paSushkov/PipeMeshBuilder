@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace PipeBuilder.Editor.Settings
@@ -42,10 +43,20 @@ namespace PipeBuilder.Editor.Settings
             if (GUILayout.Button("Build combined LODs"))
             {
                 var saveMeshes = EditorUtility.DisplayDialog("Pipe Mesh Combiner", "Save meshes as assets?", "Yes", "No");
-                var path = string.Empty;
                 if (saveMeshes)
-                    path = EditorUtility.SaveFolderPanel("Pipe Builder - target folder", string.Empty, string.Empty);
-                meshCombiner.BuildCombinedLods(path);
+                {
+                    var path = meshCombiner.meshPath ?? string.Empty;
+                    path = Path.GetFullPath(Application.dataPath + path);
+
+                    if (!Directory.Exists(path))
+                        path = Application.dataPath;
+                    path = EditorUtility.SaveFolderPanel("Pipe Mesh Combiner - target folder", path, string.Empty);
+                    meshCombiner.BuildCombinedLods(path);
+                    meshCombiner.meshPath = path.Substring(Application.dataPath.Length);
+                }
+                else
+                    meshCombiner.BuildCombinedLods(null);
+                
                 EditorUtility.SetDirty(meshCombiner);
                 GUIUtility.ExitGUI();
             }

@@ -1,4 +1,5 @@
-﻿using PipeBuilder.Editor.Settings;
+﻿using System.IO;
+using PipeBuilder.Editor.Settings;
 using UnityEditor;
 using UnityEngine;
 
@@ -84,16 +85,25 @@ namespace PipeBuilder.Editor.Menus
             EditorGUI.BeginDisabledGroup(!pipeBuilder.previewMesh);
             if (GUILayout.Button("Save mesh"))
             {
-                SavePreviewMesh(pipeBuilder.previewMesh);
+                SavePreviewMesh(pipeBuilder);
             }
 
             EditorGUI.EndDisabledGroup();
 
         }
 
-        private void SavePreviewMesh(Mesh mesh)
+        private void SavePreviewMesh(PipeBuilder builder)
         {
-            var path = EditorUtility.SaveFilePanel("Save mesh to:", string.Empty, $"{pipeBuilder.gameObject.name}_mesh", "asset");
+            var path = builder.meshPath ?? string.Empty;
+            path = Path.GetFullPath(Application.dataPath + path);
+            
+            if (!Directory.Exists(path))
+                path = Application.dataPath;
+
+            var fileName = $"{builder.gameObject.name}_mesh";
+            var mesh = builder.previewMesh;
+
+            path = EditorUtility.SaveFilePanel("Save mesh to:", path, fileName, "asset");
             if (!string.IsNullOrEmpty(path))
             {
                 var newMesh = new Mesh
@@ -106,8 +116,13 @@ namespace PipeBuilder.Editor.Menus
                     tangents = mesh.tangents
                 };
                 
-                var relativePath = path.Substring(path.IndexOf("Assets/"));
-                AssetDatabase.CreateAsset(newMesh, relativePath);
+                var projectPath = Path.GetFullPath(Path.Combine(Application.dataPath, "../"));
+                var assetPath = path.Substring(projectPath.Length);
+                AssetDatabase.CreateAsset(newMesh, assetPath);
+
+                builder.meshPath = Path.GetDirectoryName(path).Substring(Application.dataPath.Length);
+                EditorUtility.SetDirty(builder);
+                
                 GUIUtility.ExitGUI();
             }
         }

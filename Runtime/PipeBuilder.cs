@@ -19,6 +19,8 @@ namespace PipeBuilder
         public UvProperties uvProperties = new UvProperties();
         public bool drawGizmosMesh = true;
         public MeshFilter previewMeshFilter;
+        public string meshPath;
+        
         [NonSerialized] 
         public Mesh previewMesh;
         
@@ -58,7 +60,7 @@ namespace PipeBuilder
         }
 
         public List<LodElement> LODElements => lodElements;
-
+        
         public void Initialize()
         {
             InitializeControlLine();
